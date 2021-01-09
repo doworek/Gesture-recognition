@@ -10,7 +10,6 @@ class SizeChooserScreen(AppScreen):
 
         pygame.font.init()
         font_title = pygame.font.SysFont('Comic Sans MS', 53)
-        self._title_text_surface = font_title.render('Order - choose size', True, (255, 255, 255))
 
         font_milkshakes = pygame.font.SysFont('Comic Sans MS', 43)
         self._sizes = [
@@ -23,8 +22,7 @@ class SizeChooserScreen(AppScreen):
         self._chosen_size = 0
 
     def draw(self, surface) -> None:
-        surface.fill((255, 203, 203))
-        surface.blit(self._title_text_surface, self._title_position)
+        surface.blit(self._bg, (0, self._app.h - self._bg.get_height()))
 
         for i, size in enumerate(self._sizes):
             surface.blit(size, self._sizes_positions[i])
@@ -32,7 +30,7 @@ class SizeChooserScreen(AppScreen):
             if self._chosen_size == i:
                 r = size.get_rect()
                 r.move_ip(*self._sizes_positions[i])
-                pygame.draw.rect(surface, (255, 0, 0), r, 2)
+                pygame.draw.rect(surface, (202, 0, 182), r, 2)
 
     def on_ok(self) -> None:
         self._app.show_screen("Ack", self._chosen_milkshake, self._chosen_size)
@@ -50,9 +48,7 @@ class SizeChooserScreen(AppScreen):
 
     def on_registered_in_app(self, app) -> None:
         self._app = app
-        tw = self._title_text_surface.get_rect().width
-        th = self._title_text_surface.get_rect().height
-        self._title_position = (app.w / 2 - tw / 2, 300 - th)
+        self._bg = pygame.transform.smoothscale(pygame.image.load('./bg_img/size_screen.png'), (self._app.w, self._app.h))
 
         self._sizes_positions = [
             (app.w / 3 + 300 * i, app.h / 3) for i, size_label in enumerate(self._sizes)

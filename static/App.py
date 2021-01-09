@@ -1,14 +1,14 @@
 import os
-import numpy as np
 import math
 import errno
 import time
 import queue
-from collections import OrderedDict, deque
+from collections import OrderedDict
 from threading import Thread
 
 import pygame
 import cv2 as cv
+import numpy as np
 
 from AppScreen import AppScreen
 
@@ -27,10 +27,9 @@ class GestureDetectorThread(Thread):
         self.isRunning = True
 
         cv.namedWindow('frame')
-        cv.namedWindow('mask')
+        #show window with a mask to check if the lighting conditions are suitable
+        #cv.namedWindow('mask')
 
-        #LOADING HAND CASCADE
-        self._hand_cascade = cv.CascadeClassifier('D:/Hand_Recognition-master/Hand_haar_cascade.xml')
         self._event_queue = queue.Queue()
         self._tmp_queue = queue.Queue(maxsize=85)
 
@@ -57,9 +56,9 @@ class GestureDetectorThread(Thread):
                 kernel = np.ones((3,3),np.uint8)
 
                 #define region of interest
-                roi=frame[100:300, 100:300]
+                roi=frame[100:300, 300:500]
 
-                cv.rectangle(frame,(100,100),(300,300),(0,255,0),0)    
+                cv.rectangle(frame,(300,100),(500,300),(239, 45, 243),0)
                 hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
        
                 # define range of skin color in HSV
@@ -87,9 +86,9 @@ class GestureDetectorThread(Thread):
                 #find the defects in convex hull with respect to hand
                 hull = cv.convexHull(approx, returnPoints=False)
                 defects = cv.convexityDefects(approx, hull)
-                # l = no. of defects
+                # l = number of defects
                 l=0
-                #code for finding no. of defects due to fingers
+                #finding number of defects due to fingers
                 for i in range(defects.shape[0]):
                     s,e,f,d = defects[i,0]
                     start = tuple(approx[s][0])
@@ -111,39 +110,39 @@ class GestureDetectorThread(Thread):
                     # ignore angles > 90 and ignore points very close to convex hull(they generally come due to noise)
                     if angle <= 90 and d>30:
                         l += 1
-                        cv.circle(roi, far, 3, [255,0,0], -1)
+                        cv.circle(roi, far, 3, [255, 255, 80], -1)
                     #draw lines around hand
-                    cv.line(roi,start, end, [0,255,0], 2)
+                    cv.line(roi,start, end, [255, 255, 80], 2)
                 l+=1
                 #print corresponding gestures which are in their ranges
                 font = cv.FONT_HERSHEY_SIMPLEX
                 if l==1:
                     if areacnt<2000:
-                        cv.putText(frame,'Put hand in the box',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                        cv.putText(frame,'Put hand in the box',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                         g = self._gestures[4]
                     else:
                         if arearatio<12:
-                            cv.putText(frame,'0',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                            cv.putText(frame,'0',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                             g = self._gestures[4]
                         else:
-                            cv.putText(frame,'1',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                            cv.putText(frame,'1',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                             g = self._gestures[0]
                 elif l==2:
-                    cv.putText(frame,'2',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                    cv.putText(frame,'2',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                     g = self._gestures[1]
                 elif l==3:
                     if arearatio<27:
-                        cv.putText(frame,'3',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                        cv.putText(frame,'3',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                 elif l==4:
-                    cv.putText(frame,'4',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                    cv.putText(frame,'4',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                     g = self._gestures[2]
                 elif l==5:
-                    cv.putText(frame,'5',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                    cv.putText(frame,'5',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                     g = self._gestures[3]
                 elif l==6:
-                    cv.putText(frame,'reposition',(0,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                    cv.putText(frame,'reposition',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                 else:
-                    cv.putText(frame,'reposition',(10,50), font, 2, (0,0,255), 3, cv.LINE_AA)
+                    cv.putText(frame,'reposition',(10,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
 
                 try:
                     self._tmp_queue.put_nowait(g)
@@ -162,7 +161,7 @@ class GestureDetectorThread(Thread):
                     time.sleep(0.5)
             
                 #show the windows
-                cv.imshow('mask', mask)
+                #cv.imshow('mask', mask)
                 cv.imshow('frame', frame)
             except:
                 pass
@@ -225,6 +224,7 @@ class App:
                     appLoop = False
                     break
 
+                #keys for debugging
                 if self._are_debug_keys_enabled and event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         self.imitate_on_down_right()

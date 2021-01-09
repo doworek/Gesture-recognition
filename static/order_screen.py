@@ -10,7 +10,6 @@ class OrderScreen(AppScreen):
 
         pygame.font.init()
         font_title = pygame.font.SysFont('Comic Sans MS', 53)
-        self._title_text_surface = font_title.render('Order - choose taste', True, (255, 255, 255))
 
         font_milkshakes = pygame.font.SysFont('Comic Sans MS', 33)
         self._milkshakes = [
@@ -24,8 +23,7 @@ class OrderScreen(AppScreen):
         self._chosen_milkshake = 0
 
     def draw(self, surface) -> None:
-        surface.fill((158, 237, 240))
-        surface.blit(self._title_text_surface, self._title_position)
+        surface.blit(self._bg, (0, self._app.h - self._bg.get_height()))
 
         for i, milkshake in enumerate(self._milkshakes):
             surface.blit(milkshake, self._milkshakes_positions[i])
@@ -51,9 +49,7 @@ class OrderScreen(AppScreen):
 
     def on_registered_in_app(self, app) -> None:
         self._app = app
-        tw = self._title_text_surface.get_rect().width
-        th = self._title_text_surface.get_rect().height
-        self._title_position = (app.w / 2 - tw / 2, 300 - th)
+        self._bg = pygame.transform.smoothscale(pygame.image.load('./bg_img/order_screen.png'), (self._app.w, self._app.h))
 
         self._milkshakes_positions = [
             (app.w / 4, 300 + i * milkshake.get_rect().height) for i, milkshake in enumerate(self._milkshakes)

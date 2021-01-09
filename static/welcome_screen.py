@@ -8,21 +8,16 @@ class WelcomeScreen(AppScreen):
         self._app = None
 
         pygame.font.init()
-        font = pygame.font.SysFont('Comic Sans MS', 100)
-        self._text_surface = font.render('Milkshake', True, (255, 255, 255))
 
     def draw(self, surface) -> None:
-        surface.fill((255, 203, 203))
-        surface.blit(self._text_surface, self._text_position)
+        surface.blit(self._bg, (0, self._app.h - self._bg.get_height()))
 
     def on_ok(self) -> None:
         self._app.show_screen("Order")
 
     def on_registered_in_app(self, app) -> None:
         self._app = app
-        tw = self._text_surface.get_rect().width
-        th = self._text_surface.get_rect().height
-        self._text_position = (app.w / 2 - tw / 2, app.h / 2 - th / 2)
+        self._bg = pygame.transform.smoothscale(pygame.image.load('./bg_img/welcome_screen.png'), (self._app.w, self._app.h))
 
     def on_show(self, *args, **kwargs) -> None:
         pass
