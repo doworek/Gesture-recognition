@@ -1,17 +1,17 @@
 import os
-import numpy as np
 import errno
 import time
 import queue
-from collections import OrderedDict, deque
+from collections import OrderedDict
 from threading import Thread
 
 import torch
 from torchvision.transforms import Compose, CenterCrop, ToPILImage, ToTensor, Normalize
+import torch.nn as nn
 import pygame
 import cv2 as cv
+import numpy as np
 from model import ConvColumn
-import torch.nn as nn
 
 from AppScreen import AppScreen
 
@@ -39,7 +39,6 @@ class GestureDetectorThread(Thread):
 
         self._event_queue = queue.Queue()
         self._frame_queue = queue.Queue(maxsize=18)
-        #self._predict_queue = deque(maxlen=10)
         self._predict_queue = queue.Queue(maxsize=3)
 
         self._model = ConvColumn(8)
@@ -95,7 +94,6 @@ class GestureDetectorThread(Thread):
         while self.isRunning:
             start_time = time.time()
             _, frame = self._capture.read()
-            #frame = cv.flip(frame1.copy(), 1)
             frame = cv.resize(frame, self._target_frame_size)
 
             try:
@@ -140,57 +138,10 @@ class GestureDetectorThread(Thread):
                         while not self._predict_queue.empty():
                             self._predict_queue.get_nowait()
 
-                    # Do not try to find gestures too often
-                    #time.sleep(0.2)
                 else:
                     while not self._predict_queue.empty():
                         self._predict_queue.get_nowait()
 
-                #sub_tensor, class_index = nn_output.detach().cpu().topk(5, 1, True, True)
-                #top5 = [self._gestures[class_index[0][i].item()] for i in range(5)]
-                ##pred, class_index = nn_output.max(1)
-                ##pred = pred.item()
-                ##class_index = class_index.item()
-                #pi = [class_index[0][i].item() for i in range(5)]
-                #ps = [sub_tensor[0][i].item() for i in range(5)]
-                #print (ps)
-                #top1 = top5[0] if ps[0] > self.TRESHOLD else GestureDetectorThread.NO_GESTURE
-                #print (top5)
-                #hist = {}
-                #for i in range(8):
-                #    hist[i] = 0
-                #for i in range(len(pi)):
-                #   hist[pi[i]] = ps[i]
-                #self._predict_queue.append(list(hist.values()))
-
-                #ave_pred = np.array(self._predict_queue).mean(axis=0)
-                #print(max(ave_pred))
-
-                #if max(ave_pred) > self.TRESHOLD:
-                #    top1 = self._gestures[np.argmax(ave_pred)]
-                #    self._event_queue.put(top1)
-                #    print('-------------------------------------------------------------------------------------------\n')
-
-                #    while not self._frame_queue.empty():
-                #        self._frame_queue.get_nowait()
-
-                #    time.sleep(0.75)
-
-
-                #g = self._gestures[class_index]
-                #if pred > self.TRESHOLD and g != GestureDetectorThread.OTHER_GESTURE and g != GestureDetectorThread.NO_GESTURE:
-                    # Yaay! gesture found
-                    #print(g)
-                    #print(nn_output)
-
-                    #self._event_queue.put(g)
-
-                    # Clear queue
-                    #while not self._frame_queue.empty():
-                        #self._frame_queue.get_nowait()
-
-                    # Do not try to find gestures too often
-                    #time.sleep(0.75)
 
             time_diff = time.time() - start_time
             try:
@@ -255,6 +206,7 @@ class App:
                     appLoop = False
                     break
 
+                #keys for debugging
                 if self._are_debug_keys_enabled and event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         self.imitate_down_to_up_swipe_gesture()
