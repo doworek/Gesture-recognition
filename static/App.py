@@ -28,7 +28,7 @@ class GestureDetectorThread(Thread):
 
         cv.namedWindow('frame')
         #show window with a mask to check if the lighting conditions are suitable
-        #cv.namedWindow('mask')
+        cv.namedWindow('mask')
 
         self._event_queue = queue.Queue()
         self._tmp_queue = queue.Queue(maxsize=85)
@@ -122,22 +122,22 @@ class GestureDetectorThread(Thread):
                         g = self._gestures[4]
                     else:
                         if arearatio<12:
-                            cv.putText(frame,'0',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
+                            cv.putText(frame,'0',(600,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                             g = self._gestures[4]
                         else:
-                            cv.putText(frame,'1',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
+                            cv.putText(frame,'1',(600,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                             g = self._gestures[0]
                 elif l==2:
-                    cv.putText(frame,'2',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
+                    cv.putText(frame,'2',(600,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                     g = self._gestures[1]
                 elif l==3:
                     if arearatio<27:
-                        cv.putText(frame,'3',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
+                        cv.putText(frame,'3',(600,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                 elif l==4:
-                    cv.putText(frame,'4',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
+                    cv.putText(frame,'4',(600,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                     g = self._gestures[2]
                 elif l==5:
-                    cv.putText(frame,'5',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
+                    cv.putText(frame,'5',(600,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
                     g = self._gestures[3]
                 elif l==6:
                     cv.putText(frame,'reposition',(0,50), font, 2, (0, 238, 254), 3, cv.LINE_AA)
@@ -161,7 +161,7 @@ class GestureDetectorThread(Thread):
                     time.sleep(0.5)
             
                 #show the windows
-                #cv.imshow('mask', mask)
+                cv.imshow('mask', mask)
                 cv.imshow('frame', frame)
             except:
                 pass
