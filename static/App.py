@@ -3,7 +3,6 @@ import math
 import errno
 import time
 import queue
-from collections import OrderedDict
 from threading import Thread
 
 import pygame
